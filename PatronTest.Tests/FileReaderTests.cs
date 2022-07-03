@@ -38,7 +38,13 @@ namespace PatronTest.Tests
         public async Task Read_SameFileSimultaneously()
         {
             _contentReader.Waiting += async (_, _) => await _reader.ReadFileAsync("A");
-            _reader.ItemPushed += (_, item) => item.SetContent("A"); //to avoid deadlock
+            EventHandler<FileReadingItem> onItemPushed = null!;
+            onItemPushed = (_, item) =>
+            {
+                _reader.ItemPushed -= onItemPushed;
+                item.SetContent(string.Empty);
+            };
+            _reader.ItemPushed += onItemPushed; //to avoid deadlock
             Assert.That(await _reader.ReadFileAsync("A"), Is.EqualTo("A"));
             Assert.That(_contentReader.CallsCount, Is.EqualTo(1));
         }
