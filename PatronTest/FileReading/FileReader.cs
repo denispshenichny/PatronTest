@@ -17,9 +17,16 @@ namespace PatronTest.FileReading
         public async Task<string?> ReadFileAsync(string path)
         {
             var item = new FileReadingItem(path);
-            await _filesProcessor.PushFileReadingItem(item);
-            ItemPushed?.Invoke(this, item);
-            return item.GetContent();
+            try
+            {
+                await _filesProcessor.PushFileReadingItem(item);
+                ItemPushed?.Invoke(this, item);
+                return item.GetContent();
+            }
+            finally
+            {
+                _filesProcessor.RemoveFileReadingItem(item);
+            }
         }
     }
 }

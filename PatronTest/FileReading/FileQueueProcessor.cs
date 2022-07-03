@@ -16,14 +16,12 @@ namespace PatronTest.FileReading
         public async Task PushFileReadingItem(FileReadingItem item)
         {
             _items.Add(item);
-            try
-            {
-                await ReadFileIfNecessary(item.Path);
-            }
-            finally
-            {
-                _items.Remove(item);
-            }
+            await ReadFileIfNecessary(item.Path);
+        }
+
+        public void RemoveFileReadingItem(FileReadingItem item)
+        {
+            _items.Remove(item);
         }
 
         private async Task ReadFileIfNecessary(string path)
